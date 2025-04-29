@@ -6,14 +6,16 @@ namespace Infrastructure.Repositories
 {
     public class ClienteRepository : IClienteRepository
     {
-        private const string FilePath = "clientes.json"; // Caminho relativo ao projeto API (pode mudar depois)
+        private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clientes.json");
+
+        public ClienteRepository()
+        {
+            GarantirArquivoExiste();
+        }
 
         public async Task<IEnumerable<Cliente>> ListarAsync()
         {
-            if (!File.Exists(FilePath))
-                return new List<Cliente>();
-
-            var json = await File.ReadAllTextAsync(FilePath);
+            var json = await File.ReadAllTextAsync(_filePath);
             var clientes = JsonSerializer.Deserialize<List<Cliente>>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -47,7 +49,6 @@ namespace Infrastructure.Repositories
             {
                 clientes.Remove(clienteExistente);
                 clientes.Add(clienteAtualizado);
-
                 await EscreverArquivoAsync(clientes);
             }
         }
@@ -68,27 +69,24 @@ namespace Infrastructure.Repositories
         {
             var json = JsonSerializer.Serialize(clientes, new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = true // Deixa o arquivo JSON bonito (indentado)
             });
 
-            await File.WriteAllTextAsync(FilePath, json);
+            await File.WriteAllTextAsync(_filePath, json);
         }
 
         private Cliente AtualizarIds(Cliente cliente, List<Cliente> clientes)
         {
             var novoIdCliente = clientes.Any() ? clientes.Max(c => c.Id) + 1 : 1;
 
-            // Cria novo cliente já atualizado (assume que o domínio permite isso)
             var novoCliente = new Cliente(novoIdCliente, cliente.Nome, cliente.Email, cliente.Cpf, cliente.Rg);
 
-            // Atualizar os IDs de Contatos
             var novoIdContato = 1;
             foreach (var contato in cliente.Contatos)
             {
                 novoCliente.AdicionarContato(new Contato(novoIdContato++, contato.Tipo, contato.Ddd, contato.Telefone));
             }
 
-            // Atualizar os IDs de Endereços
             var novoIdEndereco = 1;
             foreach (var endereco in cliente.Enderecos)
             {
@@ -97,6 +95,18 @@ namespace Infrastructure.Repositories
             }
 
             return novoCliente;
+        }
+
+        private void GarantirArquivoExiste()
+        {
+            if (!File.Exists(_filePath))
+            {
+                var emptyList = JsonSerializer.Serialize(new List<Cliente>(), new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+                File.WriteAllText(_filePath, emptyList);
+            }
         }
     }
 }

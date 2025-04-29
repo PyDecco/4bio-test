@@ -2,6 +2,7 @@ using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 using Application.Mappers;
+using Domain.Enums;
 
 namespace Application.Services
 {
@@ -38,12 +39,20 @@ namespace Application.Services
             var cliente = new Cliente(novoId, clienteDto.Nome, clienteDto.Email, clienteDto.Cpf, clienteDto.Rg);
 
             foreach (var contatoDto in clienteDto.Contatos)
-                cliente.AdicionarContato(new Contato(contatoDto.Id, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone));
+            {
+                ValidarTipoContato(contatoDto.Tipo);
+                var novoContatoId = ObterProximoIdContato(cliente);
+                cliente.AdicionarContato(new Contato(novoContatoId, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone));
+            }
 
             foreach (var enderecoDto in clienteDto.Enderecos)
-                cliente.AdicionarEndereco(new Endereco(enderecoDto.Id, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
-                                                        enderecoDto.Numero, enderecoDto.Bairro, enderecoDto.Complemento, enderecoDto.Cidade, enderecoDto.Estado, enderecoDto.Referencia));
-
+            {
+                ValidarTipoEndereco(enderecoDto.Tipo);
+                var novoEnderecoId = ObterProximoIdEndereco(cliente);
+                cliente.AdicionarEndereco(new Endereco(novoId, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
+                enderecoDto.Numero, enderecoDto.Bairro, enderecoDto.Complemento, enderecoDto.Cidade, enderecoDto.Estado, enderecoDto.Referencia));
+            }
+            
             await _clienteRepository.SalvarAsync(cliente);
             return ClienteMapper.ToDto(cliente);
         }
@@ -56,11 +65,19 @@ namespace Application.Services
             cliente = new Cliente(id, clienteDto.Nome, clienteDto.Email, clienteDto.Cpf, clienteDto.Rg);
 
             foreach (var contatoDto in clienteDto.Contatos)
-                cliente.AdicionarContato(new Contato(contatoDto.Id, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone));
+            {
+                ValidarTipoContato(contatoDto.Tipo);
+                var novoContatoId = ObterProximoIdContato(cliente);
+                cliente.AdicionarContato(new Contato(novoContatoId, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone));
+            }
 
             foreach (var enderecoDto in clienteDto.Enderecos)
-                cliente.AdicionarEndereco(new Endereco(enderecoDto.Id, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
+            {
+                ValidarTipoEndereco(enderecoDto.Tipo);
+                var novoEnderecoId = ObterProximoIdEndereco(cliente);
+                cliente.AdicionarEndereco(new Endereco(novoEnderecoId, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
                                                         enderecoDto.Numero, enderecoDto.Bairro, enderecoDto.Complemento, enderecoDto.Cidade, enderecoDto.Estado, enderecoDto.Referencia));
+            }
 
             await _clienteRepository.AtualizarAsync(cliente);
             return ClienteMapper.ToDto(cliente);
@@ -71,91 +88,38 @@ namespace Application.Services
             await _clienteRepository.RemoverAsync(id);
         }
 
-        public async Task<ContatoDto> AdicionarContatoAsync(int idCliente, ContatoDto contatoDto)
+        private void ValidarTipoContato(string tipo)
         {
-            var cliente = await _clienteRepository.ObterPorIdAsync(idCliente)
-                ?? throw new Exception("Cliente não encontrado.");
-
-            var novoContato = new Contato(contatoDto.Id, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone);
-            cliente.AdicionarContato(novoContato);
-
-            await _clienteRepository.AtualizarAsync(cliente);
-
-            return contatoDto;
+            if (!Enum.TryParse<TipoContato>(tipo, true, out _))
+            {
+                throw new ArgumentException("Tipo de contato inválido. Valores aceitos: Residencial, Comercial, Celular.");
+            }
         }
 
-        public async Task<ContatoDto> AtualizarContatoAsync(int idCliente, ContatoDto contatoDto)
+        private void ValidarTipoEndereco(string tipo)
         {
-            var cliente = await _clienteRepository.ObterPorIdAsync(idCliente)
-                ?? throw new Exception("Cliente não encontrado.");
+            if (!Enum.TryParse<TipoEndereco>(tipo, true, out _))
+            {
+                throw new ArgumentException("Tipo de endereço inválido. Valores aceitos: Preferencial, Entrega, Cobranca.");
+            }
+        }
+    
+        private int ObterProximoIdContato(Cliente cliente)
+        {
+            List<Contato> contatos = cliente.Contatos;
+            if (contatos.Count == 0) return 1;
 
-            var contatoExistente = cliente.Contatos.FirstOrDefault(c => c.Id == contatoDto.Id)
-                ?? throw new Exception("Contato não encontrado.");
-
-            cliente.Contatos.Remove(contatoExistente);
-            cliente.AdicionarContato(new Contato(contatoDto.Id, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone));
-
-            await _clienteRepository.AtualizarAsync(cliente);
-
-            return contatoDto;
+            int maxId = contatos.Max(c => c.Id);
+            return maxId + 1;
         }
 
-        public async Task RemoverContatoAsync(int idCliente, int idContato)
+        private int ObterProximoIdEndereco(Cliente cliente)
         {
-            var cliente = await _clienteRepository.ObterPorIdAsync(idCliente)
-                ?? throw new Exception("Cliente não encontrado.");
+            List<Endereco> enderecos = cliente.Enderecos;
+            if (enderecos.Count == 0) return 1;
 
-            var contato = cliente.Contatos.FirstOrDefault(c => c.Id == idContato)
-                ?? throw new Exception("Contato não encontrado.");
-
-            cliente.Contatos.Remove(contato);
-
-            await _clienteRepository.AtualizarAsync(cliente);
+            int maxId = enderecos.Max(e => e.Id);
+            return maxId + 1;
         }
-
-        public async Task<EnderecoDto> AdicionarEnderecoAsync(int idCliente, EnderecoDto enderecoDto)
-        {
-            var cliente = await _clienteRepository.ObterPorIdAsync(idCliente)
-                ?? throw new Exception("Cliente não encontrado.");
-
-            var novoEndereco = new Endereco(enderecoDto.Id, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
-                                            enderecoDto.Numero, enderecoDto.Bairro, enderecoDto.Complemento, enderecoDto.Cidade, enderecoDto.Estado, enderecoDto.Referencia);
-            cliente.AdicionarEndereco(novoEndereco);
-
-            await _clienteRepository.AtualizarAsync(cliente);
-
-            return enderecoDto;
-        }
-
-        public async Task<EnderecoDto> AtualizarEnderecoAsync(int idCliente, EnderecoDto enderecoDto)
-        {
-            var cliente = await _clienteRepository.ObterPorIdAsync(idCliente)
-                ?? throw new Exception("Cliente não encontrado.");
-
-            var enderecoExistente = cliente.Enderecos.FirstOrDefault(e => e.Id == enderecoDto.Id)
-                ?? throw new Exception("Endereço não encontrado.");
-
-            cliente.Enderecos.Remove(enderecoExistente);
-            cliente.AdicionarEndereco(new Endereco(enderecoDto.Id, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
-                                                    enderecoDto.Numero, enderecoDto.Bairro, enderecoDto.Complemento, enderecoDto.Cidade, enderecoDto.Estado, enderecoDto.Referencia));
-
-            await _clienteRepository.AtualizarAsync(cliente);
-
-            return enderecoDto;
-        }
-
-        public async Task RemoverEnderecoAsync(int idCliente, int idEndereco)
-        {
-            var cliente = await _clienteRepository.ObterPorIdAsync(idCliente)
-                ?? throw new Exception("Cliente não encontrado.");
-
-            var endereco = cliente.Enderecos.FirstOrDefault(e => e.Id == idEndereco)
-                ?? throw new Exception("Endereço não encontrado.");
-
-            cliente.Enderecos.Remove(endereco);
-
-            await _clienteRepository.AtualizarAsync(cliente);
-        }
-
     }
 }

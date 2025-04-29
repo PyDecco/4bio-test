@@ -2,13 +2,13 @@ namespace Domain.Entities
 {
     public class Cliente
     {
-        public int Id { get; private set; }
-        public string Nome { get; private set; }
-        public string Email { get; private set; }
-        public string Cpf { get; private set; }
-        public string Rg { get; private set; }
-        public List<Contato> Contatos { get; private set; }
-        public List<Endereco> Enderecos { get; private set; }
+        public int Id { get;  set; }
+        public string Nome { get;  set; }
+        public string Email { get;  set; }
+        public string Cpf { get;  set; }
+        public string Rg { get;  set; }
+        public List<Contato> Contatos { get; set; } = new();
+        public List<Endereco> Enderecos { get; set; } = new();
 
         public Cliente(int id, string nome, string email, string cpf, string rg)
         {
