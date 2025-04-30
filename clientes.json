@@ -1,0 +1,155 @@
+[
+    {
+      "id": 1,
+      "nome": "João da Silva",
+      "email": "joao.silva@exemplo.com",
+      "cpf": "253.544.628-51",
+      "rg": "12.345.678-9",
+      "contatos": [
+        {
+          "id": 1,
+          "tipo": "Celular",
+          "ddd": 11,
+          "telefone": "987654321"
+        }
+      ],
+      "enderecos": [
+        {
+          "id": 1,
+          "tipo": "Preferencial",
+          "cep": "04567-890",
+          "logradouro": "Rua das Flores",
+          "numero": 123,
+          "bairro": "Centro",
+          "complemento": "Apto 101",
+          "cidade": "São Paulo",
+          "estado": "SP",
+          "referencia": "Próximo ao mercado"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "nome": "Maria Oliveira",
+      "email": "maria.oliveira@empresa.com",
+      "cpf": "390.255.118-02",
+      "rg": "11.111.111-1",
+      "contatos": [
+        {
+          "id": 1,
+          "tipo": "Comercial",
+          "ddd": 21,
+          "telefone": "31313131"
+        },
+        {
+          "id": 2,
+          "tipo": "Celular",
+          "ddd": 21,
+          "telefone": "999991234"
+        }
+      ],
+      "enderecos": [
+        {
+          "id": 1,
+          "tipo": "Entrega",
+          "cep": "22290-240",
+          "logradouro": "Av. Atlântica",
+          "numero": 500,
+          "bairro": "Copacabana",
+          "complemento": "Sala 2",
+          "cidade": "Rio de Janeiro",
+          "estado": "RJ",
+          "referencia": "Prédio azul"
+        },
+        {
+          "id": 2,
+          "tipo": "Cobranca",
+          "cep": "22041-001",
+          "logradouro": "Rua Figueiredo",
+          "numero": 140,
+          "bairro": "Centro",
+          "complemento": "",
+          "cidade": "Rio de Janeiro",
+          "estado": "RJ",
+          "referencia": ""
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "nome": "Carlos Pereira",
+      "email": "carlos.p@contato.com",
+      "cpf": "123.987.456-00",
+      "rg": "55.222.333-2",
+      "contatos": [
+        {
+          "id": 1,
+          "tipo": "Residencial",
+          "ddd": 31,
+          "telefone": "32223344"
+        }
+      ],
+      "enderecos": [
+        {
+          "id": 1,
+          "tipo": "Preferencial",
+          "cep": "30130-000",
+          "logradouro": "Rua da Bahia",
+          "numero": 800,
+          "bairro": "Funcionários",
+          "complemento": "Cobertura",
+          "cidade": "Belo Horizonte",
+          "estado": "MG",
+          "referencia": "Próximo ao Parque Municipal"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "nome": "Ana Souza",
+      "email": "ana.souza@dominio.com",
+      "cpf": "888.444.222-11",
+      "rg": "77.888.999-0",
+      "contatos": [
+        {
+          "id": 1,
+          "tipo": "Celular",
+          "ddd": 41,
+          "telefone": "988888888"
+        },
+        {
+          "id": 2,
+          "tipo": "Comercial",
+          "ddd": 41,
+          "telefone": "32323232"
+        }
+      ],
+      "enderecos": [
+        {
+          "id": 1,
+          "tipo": "Entrega",
+          "cep": "80020-310",
+          "logradouro": "Av. Sete de Setembro",
+          "numero": 2000,
+          "bairro": "Centro",
+          "complemento": "Bloco B",
+          "cidade": "Curitiba",
+          "estado": "PR",
+          "referencia": "Edifício Alfa"
+        },
+        {
+          "id": 2,
+          "tipo": "Cobranca",
+          "cep": "80010-500",
+          "logradouro": "Rua XV de Novembro",
+          "numero": 1234,
+          "bairro": "Alto da Glória",
+          "complemento": "",
+          "cidade": "Curitiba",
+          "estado": "PR",
+          "referencia": "Próximo à catedral"
+        }
+      ]
+    }
+]
+  

@@ -1,0 +1,162 @@
+{
+	"info": {
+		"_postman_id": "4803da63-cb13-4bb9-8db3-fc8451b9a5bc",
+		"name": "4bio",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32159952",
+		"_collection_link": "https://likeappro.postman.co/workspace/Likeappro~965e1496-cf0c-4735-9203-3114c9f4010e/collection/32159952-4803da63-cb13-4bb9-8db3-fc8451b9a5bc?action=share&source=collection_link&creator=32159952"
+	},
+	"item": [
+		{
+			"name": "clientes",
+			"item": [
+				{
+					"name": "criacao de clientes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"João da Silva\",\n  \"email\": \"joao.silva@exemplo.com\",\n  \"cpf\": \"253.544.628-51\",\n  \"rg\": \"12.345.678-9\",\n  \"contatos\": [\n    {\n      \"tipo\": \"Celular\",\n      \"ddd\": 11,\n      \"telefone\": \"987654321\"\n    }\n  ],\n  \"enderecos\": [\n    {\n      \"tipo\": \"Preferencial\",\n      \"cep\": \"04567-890\",\n      \"logradouro\": \"Rua das Flores\",\n      \"numero\": 123,\n      \"bairro\": \"Centro\",\n      \"complemento\": \"Apto 101\",\n      \"cidade\": \"São Paulo\",\n      \"estado\": \"SP\",\n      \"referencia\": \"Próximo ao mercado\"\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5131/cliente/criar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5131",
+							"path": [
+								"cliente",
+								"criar"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'POST' \\\n  'http://localhost:5131/cliente/criar' \\\n  -H 'accept: text/plain' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n  \"nome\": \"João da Silva\",\n  \"email\": \"joao.silva@exemplo.com\",\n  \"cpf\": \"253.544.628-51\",\n  \"rg\": \"12.345.678-9\",\n  \"contatos\": [\n    {\n      \"tipo\": \"Celular\",\n      \"ddd\": 11,\n      \"telefone\": \"987654321\"\n    }\n  ],\n  \"enderecos\": [\n    {\n      \"tipo\": \"Preferencial\",\n      \"cep\": \"04567-890\",\n      \"logradouro\": \"Rua das Flores\",\n      \"numero\": 123,\n      \"bairro\": \"Centro\",\n      \"complemento\": \"Apto 101\",\n      \"cidade\": \"São Paulo\",\n      \"estado\": \"SP\",\n      \"referencia\": \"Próximo ao mercado\"\n    }\n  ]\n}\n'"
+					},
+					"response": []
+				},
+				{
+					"name": "busca de clientes por filtro ",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5131/cliente/listar?nome=string&email=user2%40example.com&cpf=942.237.643-35",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5131",
+							"path": [
+								"cliente",
+								"listar"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "string"
+								},
+								{
+									"key": "email",
+									"value": "user2%40example.com"
+								},
+								{
+									"key": "cpf",
+									"value": "942.237.643-35"
+								}
+							]
+						},
+						"description": "Generated from cURL: curl -X 'GET' \\\n  'http://localhost:5131/cliente/listar?nome=string&email=user2%40example.com&cpf=942.237.643-35' \\\n  -H 'accept: text/plain'"
+					},
+					"response": []
+				},
+				{
+					"name": "atualizacao de clientes utilizando id como parametro",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "accept",
+								"value": "text/plain"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\n  \"nome\": \"João da Silva\",\n  \"email\": \"joao.silva@exemplo.com\",\n  \"cpf\": \"253.544.628-51\",\n  \"rg\": \"12.345.678-9\",\n  \"contatos\": [\n    {\n      \"tipo\": \"Celular\",\n      \"ddd\": 11,\n      \"telefone\": \"987654321\"\n    }\n  ],\n  \"enderecos\": [\n    {\n      \"tipo\": \"Preferencial\",\n      \"cep\": \"04567-890\",\n      \"logradouro\": \"Rua das Flores\",\n      \"numero\": 123,\n      \"bairro\": \"Centro\",\n      \"complemento\": \"Apto 101\",\n      \"cidade\": \"São Paulo\",\n      \"estado\": \"SP\",\n      \"referencia\": \"Próximo ao mercado\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5131/cliente/atualizar/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5131",
+							"path": [
+								"cliente",
+								"atualizar",
+								"1"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'PUT' \\\n  'http://localhost:5131/cliente/atualizar/1' \\\n  -H 'accept: text/plain' \\\n  -H 'Content-Type: application/json' \\\n  -d '  {\n  \"nome\": \"João da Silva\",\n  \"email\": \"joao.silva@exemplo.com\",\n  \"cpf\": \"253.544.628-51\",\n  \"rg\": \"12.345.678-9\",\n  \"contatos\": [\n    {\n      \"tipo\": \"Celular\",\n      \"ddd\": 11,\n      \"telefone\": \"987654321\"\n    }\n  ],\n  \"enderecos\": [\n    {\n      \"tipo\": \"Preferencial\",\n      \"cep\": \"04567-890\",\n      \"logradouro\": \"Rua das Flores\",\n      \"numero\": 123,\n      \"bairro\": \"Centro\",\n      \"complemento\": \"Apto 101\",\n      \"cidade\": \"São Paulo\",\n      \"estado\": \"SP\",\n      \"referencia\": \"Próximo ao mercado\"\n    }\n  ]\n}'"
+					},
+					"response": []
+				},
+				{
+					"name": "remoção do cliente e de seus respectivos objetos",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5131/cliente/remover/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5131",
+							"path": [
+								"cliente",
+								"remover",
+								"1"
+							]
+						},
+						"description": "Generated from cURL: curl -X 'DELETE' \\\n  'http://localhost:5131/cliente/remover/1' \\\n  -H 'accept: */*'"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
