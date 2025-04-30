@@ -208,4 +208,4 @@ Alguns pontos que poderiam ser evoluídos em versões futuras:
 Desenvolvido por **André Urpia**.
 
 - GitHub: [@PyDecco](https://github.com/PyDecco)
-- LinkedIn: [linkedin.com/in/andre-urpía](https://www.linkedin.com/in/andreurpia/) *(ou seu link personalizado real)*
+- LinkedIn: [linkedin.com/in/andreurpía](https://www.linkedin.com/in/andreurpia/) *(ou seu link personalizado real)*
