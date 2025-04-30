@@ -6,19 +6,14 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("cliente")]
-    public class ClienteController : ControllerBase
+    public class ClienteController(IClienteService clienteService) : ControllerBase
     {
-        private readonly IClienteService _clienteService;
-
-        public ClienteController(IClienteService clienteService)
-        {
-            _clienteService = clienteService;
-        }
+        private readonly IClienteService _clienteService = clienteService;
 
         [HttpGet("listar")]
-        public async Task<ActionResult<IEnumerable<ClienteDto>>> Listar([FromQuery] string? nome, [FromQuery] string? email, [FromQuery] string? cpf)
+        public async Task<ActionResult<IEnumerable<ClienteDto>>> Listar([FromQuery] ClienteFiltroDto filtro)
         {
-            var clientes = await _clienteService.ListarAsync(nome, email, cpf);
+            var clientes = await _clienteService.ListarAsync(filtro);
             return Ok(clientes);
         }
 

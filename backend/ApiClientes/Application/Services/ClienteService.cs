@@ -9,78 +9,41 @@ namespace Application.Services
     public class ClienteService : IClienteService
     {
         private readonly IClienteRepository _clienteRepository;
-
         public ClienteService(IClienteRepository clienteRepository)
         {
             _clienteRepository = clienteRepository;
         }
-
-        public async Task<IEnumerable<ClienteDto>> ListarAsync(string? nome = null, string? email = null, string? cpf = null)
+        public async Task<IEnumerable<ClienteDto>> ListarAsync(ClienteFiltroDto filtro)
         {
             var clientes = await _clienteRepository.ListarAsync();
 
-            if (!string.IsNullOrWhiteSpace(nome))
-                clientes = clientes.Where(c => c.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase));
+            var filtrados = FiltrarClientes(clientes, filtro);
 
-            if (!string.IsNullOrWhiteSpace(email))
-                clientes = clientes.Where(c => c.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-
-            if (!string.IsNullOrWhiteSpace(cpf))
-                clientes = clientes.Where(c => c.Cpf == cpf);
-
-            return clientes.Select(ClienteMapper.ToDto);
+            return filtrados.Select(ClienteMapper.ToDto);
         }
 
         public async Task<ClienteDto> CriarAsync(ClienteDto clienteDto)
         {
             var clientes = await _clienteRepository.ListarAsync();
-            var novoId = clientes.Any() ? clientes.Max(c => c.Id) + 1 : 1;
+            int novoId = ObterProximoIdCliente(clientes);
 
-            var cliente = new Cliente(novoId, clienteDto.Nome, clienteDto.Email, clienteDto.Cpf, clienteDto.Rg);
+            var cliente = ConstruirCliente(clienteDto, novoId);
 
-            foreach (var contatoDto in clienteDto.Contatos)
-            {
-                ValidarTipoContato(contatoDto.Tipo);
-                var novoContatoId = ObterProximoIdContato(cliente);
-                cliente.AdicionarContato(new Contato(novoContatoId, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone));
-            }
-
-            foreach (var enderecoDto in clienteDto.Enderecos)
-            {
-                ValidarTipoEndereco(enderecoDto.Tipo);
-                var novoEnderecoId = ObterProximoIdEndereco(cliente);
-                cliente.AdicionarEndereco(new Endereco(novoId, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
-                enderecoDto.Numero, enderecoDto.Bairro, enderecoDto.Complemento, enderecoDto.Cidade, enderecoDto.Estado, enderecoDto.Referencia));
-            }
-            
             await _clienteRepository.SalvarAsync(cliente);
+
             return ClienteMapper.ToDto(cliente);
         }
 
         public async Task<ClienteDto> AtualizarAsync(int id, ClienteDto clienteDto)
         {
-            var cliente = await _clienteRepository.ObterPorIdAsync(id)
+            var clienteExistente = await _clienteRepository.ObterPorIdAsync(id)
                 ?? throw new Exception("Cliente não encontrado.");
 
-            cliente = new Cliente(id, clienteDto.Nome, clienteDto.Email, clienteDto.Cpf, clienteDto.Rg);
+            var clienteAtualizado = ConstruirCliente(clienteDto, id);
 
-            foreach (var contatoDto in clienteDto.Contatos)
-            {
-                ValidarTipoContato(contatoDto.Tipo);
-                var novoContatoId = ObterProximoIdContato(cliente);
-                cliente.AdicionarContato(new Contato(novoContatoId, contatoDto.Tipo, contatoDto.Ddd, contatoDto.Telefone));
-            }
+            await _clienteRepository.AtualizarAsync(clienteAtualizado);
 
-            foreach (var enderecoDto in clienteDto.Enderecos)
-            {
-                ValidarTipoEndereco(enderecoDto.Tipo);
-                var novoEnderecoId = ObterProximoIdEndereco(cliente);
-                cliente.AdicionarEndereco(new Endereco(novoEnderecoId, enderecoDto.Tipo, enderecoDto.Cep, enderecoDto.Logradouro,
-                                                        enderecoDto.Numero, enderecoDto.Bairro, enderecoDto.Complemento, enderecoDto.Cidade, enderecoDto.Estado, enderecoDto.Referencia));
-            }
-
-            await _clienteRepository.AtualizarAsync(cliente);
-            return ClienteMapper.ToDto(cliente);
+            return ClienteMapper.ToDto(clienteAtualizado);
         }
 
         public async Task RemoverAsync(int id)
@@ -104,22 +67,49 @@ namespace Application.Services
             }
         }
     
-        private int ObterProximoIdContato(Cliente cliente)
+        private int ObterProximoIdCliente(IEnumerable<Cliente> clientes)
         {
-            List<Contato> contatos = cliente.Contatos;
-            if (contatos.Count == 0) return 1;
+            List<Cliente> listaClientes = clientes.ToList();
+            if (listaClientes.Count == 0) return 1;
 
-            int maxId = contatos.Max(c => c.Id);
+            int maxId = listaClientes.Max(c => c.Id);
             return maxId + 1;
         }
-
-        private int ObterProximoIdEndereco(Cliente cliente)
+    
+        private IEnumerable<Cliente> FiltrarClientes(IEnumerable<Cliente> clientes, ClienteFiltroDto filtro)
         {
-            List<Endereco> enderecos = cliente.Enderecos;
-            if (enderecos.Count == 0) return 1;
+            if (!string.IsNullOrWhiteSpace(filtro.Nome))
+                clientes = clientes.Where(c => c.Nome.Contains(filtro.Nome, StringComparison.OrdinalIgnoreCase));
 
-            int maxId = enderecos.Max(e => e.Id);
-            return maxId + 1;
+            if (!string.IsNullOrWhiteSpace(filtro.Email))
+                clientes = clientes.Where(c => c.Email.Equals(filtro.Email, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(filtro.Cpf))
+                clientes = clientes.Where(c => c.Cpf == filtro.Cpf);
+
+            return clientes;
+        }
+    
+        private Cliente ConstruirCliente(ClienteDto dto, int novoId)
+        {
+            var cliente = new Cliente(novoId, dto.Nome, dto.Email, dto.Cpf, dto.Rg);
+
+            int contatoId = 1;
+            foreach (var contato in dto.Contatos)
+            {
+                ValidarTipoContato(contato.Tipo);
+                cliente.AdicionarContato(new Contato(contatoId++, contato.Tipo, contato.Ddd, contato.Telefone));
+            }
+
+            int enderecoId = 1;
+            foreach (var endereco in dto.Enderecos)
+            {
+                ValidarTipoEndereco(endereco.Tipo);
+                cliente.AdicionarEndereco(new Endereco(enderecoId++, endereco.Tipo, endereco.Cep, endereco.Logradouro,
+                    endereco.Numero, endereco.Bairro, endereco.Complemento, endereco.Cidade, endereco.Estado, endereco.Referencia));
+            }
+
+            return cliente;
         }
     }
 }
